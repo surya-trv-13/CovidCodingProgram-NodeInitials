@@ -1,5 +1,8 @@
 var app = require('express')();
 var hbs = require('hbs');
+var fs = require('fs');
+
+const port = process.env.PORT || 3100;
 
 // var app = express();
 app.set('view engine', 'hbs');
@@ -17,18 +20,15 @@ hbs.registerHelper('CurrentYear' , () => {
 
 
 app.use((req , res , next) =>{
-    console.log(`${new Date().toString()} : ${req.method} ${req.url}`);
+    fs.appendFileSync('server.log',`${new Date().toString()} : ${req.method} ${req.url}`);
+    // console.log(`${new Date().toString()} : ${req.method} ${req.url}`);
     next();
 });
-// app.get('*', (req , res) => {
-//     res.render('404' , {
-//         headPart:'PAge not Found',
-//         paraPart : 'Check Other Routes'
-//     })
+
+//Maintainance Page
+// app.use((req , res , next) => {
+//     res.render('maintain.hbs');
 // });
-app.use((req , res , next) => {
-    // res.render('maintain.hbs');
-});
 
 app.use(require('express').static(__dirname + '/public'));
 app.get('/' ,(req ,res) => {
@@ -44,9 +44,16 @@ app.get('/about' , (req,res) => {
         paraPart : `This is paragraph ${new Date().toString()}`
     })
     // res.send('<h1>About Page</h1>');
-})
+});
 
-app.listen(3100, () =>{
-    console.log('Server is running in 3100');
+app.get('*', (req , res) => {
+    res.render('404' , {
+        headPart:'PAge not Found',
+        paraPart : 'Check Other Routes'
+    })
+});
+
+app.listen(port, () =>{
+    console.log(`Server is running in ${port}`);
     
 })
